@@ -34,6 +34,11 @@ def create(details: CreateJobRequest, db: Session = Depends(get_db)):
     }
 
 
+@app.get("/")
+def get_by_id(id: int, db: Session = Depends(get_db)):
+    return db.query(Job).filter(Job.id == id).first()
+
+
 if __name__ == '__main__':
     uvicorn.run(app, port=8000, host='127.0.0.1')
 
