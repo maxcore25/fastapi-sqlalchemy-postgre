@@ -1,15 +1,11 @@
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import uvicorn
-
-
-class Item(BaseModel):
-    name: str
-    price: float
-    is_offer: Optional[bool] = None
-
+from schemas import CreateJobRequest
+from sqlalchemy.orm import Session
+from database import get_db
+from models import Job
 
 app = FastAPI()
 
@@ -24,19 +20,18 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
-
-
-@app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item):
-    return {"item_name": item.name, "item_id": item_id}
+@app.post("/")
+def create(details: CreateJobRequest, db: Session = Depends(get_db)):
+    to_create = Job(
+        title=details.title,
+        description=details.description
+    )
+    db.add(to_create)
+    db.commit()
+    return {
+        'success': True,
+        'created_id': to_create.id
+    }
 
 
 if __name__ == '__main__':
