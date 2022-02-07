@@ -39,6 +39,13 @@ def get_by_id(id: int, db: Session = Depends(get_db)):
     return db.query(Job).filter(Job.id == id).first()
 
 
+@app.delete("/")
+def delete(id: int, db: Session = Depends(get_db)):
+    db.query(Job).filter(Job.id == id).delete()
+    db.commit()
+    return {'success': True}
+
+
 if __name__ == '__main__':
     uvicorn.run(app, port=8000, host='127.0.0.1')
 
