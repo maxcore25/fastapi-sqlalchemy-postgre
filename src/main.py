@@ -46,6 +46,13 @@ def delete(id: int, db: Session = Depends(get_db)):
     return {'success': True}
 
 
+@app.put("/")
+def update(id: int, details: CreateJobRequest, db: Session = Depends(get_db)):
+    db.query(Job).filter(Job.id == id).update({'title': details.title, 'description': details.description})
+    db.commit()
+    return {'success': True}
+
+
 if __name__ == '__main__':
     uvicorn.run(app, port=8000, host='127.0.0.1')
 
